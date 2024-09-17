@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+	<title>fasf</title>
+	<link rel='stylesheet' href="{% static 'style/dashboard.css'%}">
+	
+</head>
+<body>
+<nav>
+	<div class='picContain'>
+		<div class='pic'></div>
+		
+	</div>
+	<div class='nav'>
+	<a><p>{{user.username}}</p></a>
+	<a><p>Connected Modules</p></a>
+	<a><p>Sensor Data History</p></a>
+	</div>
+</nav>	
+<section>
+	<article class='overallstatus'>
+		<h1>Overall Farm Status</h1>	
+		<div class='OverAllStatusContainer'>
+			<div class='OverallDataContainer'>
+				<div class='card'>
+					<div class="gauge">
+					</div>
+					<p class='gaugeName'>Temperature Gauge</p>
+				</div>
+				<div class='card'>
+					<div class="gauge">
+					</div>
+					<p class='gaugeName'>Temperature Gauge</p>
+				</div>
+				<div class='card'>
+					<div class="gauge">
+					</div>
+					<p class='gaugeName'>Temperature Gauge</p>
+				</div>
+				<div class='card'>
+					<div class="gauge">
+					</div>
+					<p class='gaugeName'>Temperature Gauge</p>
+				</div>
+				<div class='card'>
+					<div class="gauge">
+					</div>
+					<p class='gaugeName'>Temperature Gauge</p>
+				</div>
+				<div class='card'>
+					<div class="gauge">
+					</div>
+					<p class='gaugeName'>Temperature Gauge</p>
+				</div>																				
+			</div>
+			<div class='ActivityLog'>
+				<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+								<div class='Message'>
+					<p>Motor has started 3 sec ago</p>
+				</div>
+				
+			</div>
+		</div>
+	</article>
+	<article class='connectedModules'>
+		<h1>Connected Modules </h1>
+		<div class='container'>
+		<div class='sensorModules'>
+		<h1>Sensor Modules</h1>
+			<div class='Container'>
+				<div class='card'>
+						<h1>Module 1</h1>
+						<ul>
+							<li>Temperature</li>
+							<li>Humidity</li>
+							<li>Soil Moisture</li>
+							<li>pH Level</li>
+							
+							
+						</ul>
+				
+				</div>
+				<!-- Add modules btn -->
+			 	<a href="{% url 'assignModule' user.id %}"><div class='card'>
+					
+					<h1>ADD MODULES</h1>
+				</div></a>
+			</div>
+		</div>
+		<div class='WaterLevelGuage'>
+			<div class='line'></div>
+			<div class='line'></div>
+			<div class='line'></div>
+			<p>Water Level</p>
+		</div>
+		</div>
+		<div class='AccutatorModules'>
+		<h1>Accutator Modules</h1>
+			<div class='Container'>
+				
+									<div class='card'>
+						<h1>Module 1</h1>
+						<ul>
+							<li>Temperature</li>
+							<li>Humidity</li>
+							<li>Soil Moisture</li>
+							<li>pH Level</li>
+							
+							
+						</ul>
+				
+				</div>
+				<div class='card'>
+					<h1>Module 1</h1>
+											<ul>
+							<li>Temperature</li>
+							<li>Humidity</li>
+							<li>Soil Moisture</li>
+							<li>pH Level</li>
+							
+							
+						</ul>
+				
+				</div>
+				<div class='card'>
+					<h1>Module 1</h1>
+											<ul>
+							<li>Temperature</li>
+							<li>Humidity</li>
+							<li>Soil Moisture</li>
+							<li>pH Level</li>
+							
+							
+						</ul>
+				
+				</div>
+				<div class='card'>
+					<h1>Module 1</h1>
+							<ul>
+							<li>Temperature</li>
+							<li>Humidity</li>
+							<li>Soil Moisture</li>
+							<li>pH Level</li>
+						</ul>
+				
+				</div>
+								<div class='card'>
+					
+					<h1>ADD MODULES</h1>
+				</div>
+				
+				</div>
+			
+			
+		</div>
+	</article>
+
+</section>	
+
+<script>
+	
+function logfunc(){
+	let deg = document.querySelector('input').value
+	console.log(deg);
+	console.log(getComputedStyle(document.querySelector('.gauge')).getPropertyValue('--deg'));
+	document.querySelector('.gauge').style.setProperty('--deg',`${deg}deg`);
+}
+
+</script>
+</body>
+</html>

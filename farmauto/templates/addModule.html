@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Modules to Farmer</title>
+</head>
+<body>
+    <h2>Assign Modules to {{ farmer.username }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.as_p }}
+
+        <button type="submit">Assign Modules</button>
+    </form>
+
+    <h3>Currently Assigned Modules:</h3>
+    <ul>
+        {% for module in farmer.modules.all %}
+            <li>{{ module.name }}</li>
+        {% empty %}
+            <li>No modules assigned yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

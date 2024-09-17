@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Modules </title>
+</head>
+<body>
+    <h2>Create Modules</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.as_p }}
+
+        <button type="submit">Create Modules</button>
+    </form>
+
+    <h3>Currently Assigned Modules:</h3>
+    <ul>
+        {% for module in modules %}
+            <li>{{ module.name }}</li>
+        {% empty %}
+            <li>No modules assigned yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

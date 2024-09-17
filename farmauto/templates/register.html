@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Farm Auto</title>
+    <link rel='stylesheet' href="{%static 'style/style.css'%}">
+    <link rel='logo' href="{%static 'logo.jpg'%}">
+    
+</head>
+
+<body>
+    <header>
+        <h2>FARM AUTO</h2>
+        <nav>
+            <div class='nav_items'>Home</div>
+            <div class='nav_items'>Home</div>
+            <div class='nav_items'>Home</div>
+            <a href='login'><div class='nav_login'><img src="{%static 'images/login.png'%}">Login</div></a>
+        </nav>
+    </header>
+
+    <section class='home '>
+	<form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+		
+		<div class='form' id="LoginForm">
+            <!-- <h1>LOGIN FORM</h1>
+		<input name='username' id='username' placeholder='Enter your Phone Number' type='text'>
+		<input name='password' id='password' placeholder='Enter your Password' type='password'>
+        -->
+        {{form.as_p}}
+		<input type='submit' class='submit'>
+		</div>
+              
+    {% if error_message %}
+    <div style="color: red;">{{ error_message }}</div>
+    {% endif %} 
+   
+	</form>		
+		
+		
+    <img class='background' src="{%static 'images/Frame 1.png'%}">
+    <div class='tractor'>
+        <img class='tractor-body' src="{%static 'images/tractor.png'%}">
+        <img class='tractor-big-wheel tractor-wheel' src="{%static 'images/bigwheel.png'%}">
+        <img class='tractor-small-wheel tractor-wheel' src="{%static 'images/smallwheel.png'%}">
+    </div>
+    <img class='windmill' src = "{%static 'images/windmill.png'%}">
+    <img class='bottom' src="{%static 'images/herodown.png'%}">
+    
+ 
+    </section>
+   
+     
+    
+</body>
+
+</html>
