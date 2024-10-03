@@ -1,0 +1,122 @@
+
+</body>
+</html>
+{% load static %}
+<!DOCTYPE html>
+<head>
+	<title>fasf</title>
+	<link rel='stylesheet' href="{% static 'style/dashboard.css'%}">
+	
+</head>
+<body>
+<nav>
+	<div class='picContain'>
+		<div class='pic'></div>
+		
+	</div>
+	<div class='nav'>
+	<a><p>{{user.username}}</p></a>
+	<a><p>Connected Modules</p></a>
+	<a><p>Sensor Data History</p></a>
+	</div>
+</nav>	
+<section>
+    <article class="modules">
+        <h2>Assign Modules ssto {{ farmer.username }}</h2>
+        <form method="post" class="form-container" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {{ form.as_p }}
+            <input type="hidden" name="module_name" value="{{ module_name }}">
+    
+            <button type="submit">Assign Modules</button>
+        </form>
+    
+        <h3>Currently Assigned Modules:</h3>
+        <ul>
+            {% for module in farmer.modules.all %}
+                <li>{{ module.name }}</li>
+            {% empty %}
+                <li>No modules assigned yet.</li>
+            {% endfor %}
+        </ul>
+    </article>
+	
+</section>	
+
+
+	
+    <script>
+    
+    document.getElementById('id_sensor_module').required = false;
+    document.addEventListener('DOMContentLoaded', function() {
+        var valuePatternRadios = document.getElementsByName('value_pattern');
+        Array.prototype.forEach.call(valuePatternRadios, function(radio) {
+            radio.addEventListener('click', function() {
+                var sensorModuleContainer = document.getElementById('id_sensor_module').parentElement;
+                if (this.value === 'Individual') {
+                    sensorModuleContainer.style.display = 'block';
+                    console.log("on");
+                    
+                } else {
+                    document.getElementById('id_sensor_module').value = '';  // Clear the sensor_module field
+                    sensorModuleContainer.style.display = 'none';
+                    console.log("off");
+                }
+            });
+        });
+    });
+    
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the sensor_module and sensor_type elements
+        const sensorModuleSelect = document.getElementById('id_sensor_module');
+        const sensorTypeSelect = document.getElementById('id_sensor_type');
+
+        // Function to clear and populate sensor type options
+        function updateSensorTypeOptions(sensorTypes) {
+            // Clear existing options
+            sensorTypeSelect.innerHTML = '';
+            console.log(sensorTypes);
+            
+            // Add a placeholder option
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Select a sensor type';
+            sensorTypeSelect.appendChild(placeholderOption);
+            
+            // Populate new options
+            sensorTypes.forEach(type => {
+                console.log(type.value)
+                const option = document.createElement('option');
+                option.value = type.value;
+                option.textContent = type.label;
+                sensorTypeSelect.appendChild(option);
+            });
+        }
+
+        // Listen for changes on the sensor_module field
+        sensorModuleSelect.addEventListener('change', function() {
+            const moduleId = sensorModuleSelect.value;
+            console.log(moduleId)
+            if (moduleId) {
+                // Send an AJAX request to fetch the sensor types for the selected module
+                fetch(`/get-sensor-types/?module_id=${moduleId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update the sensor_type select field with the new options
+                        updateSensorTypeOptions(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching sensor types:', error,2);
+                    });
+            } else {
+                // If no module is selected, clear the sensor type field
+                updateSensorTypeOptions([]);
+            }
+        });
+    });
+
+
+</script>
+</body>
+</html>

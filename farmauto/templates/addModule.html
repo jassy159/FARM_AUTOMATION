@@ -1,25 +1,51 @@
+
+</body>
+</html>
+{% load static %}
 <!DOCTYPE html>
-<html>
 <head>
-    <title>Assign Modules to Farmer</title>
+	<title>fasf</title>
+	<link rel='stylesheet' href="{% static 'style/dashboard.css'%}">
+	
 </head>
 <body>
-    <h2>Assign Modules to {{ farmer.username }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        {{ form.as_p }}
+<nav>
+	<div class='picContain'>
+		<div class='pic'></div>
+		
+	</div>
+	<div class='nav'>
+	<a><p>{{user.username}}</p></a>
+	<a><p>Connected Modules</p></a>
+	<a><p>Sensor Data History</p></a>
+	</div>
+</nav>	
+<section>
+    <article class="modules">
+        <h2>Assign Modules to {{ farmer.username }}</h2>
+        <form method="post" class="form-container">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {{ form.as_p }}
+    
+            <button type="submit">Assign Modules</button>
+        </form>
+    
+        <h3>Currently Assigned Modules:</h3>
+        <ul>
+            {% for module in farmer.modules.all %}
+                <li>{{ module.name }}</li>
+            {% empty %}
+                <li>No modules assigned yet.</li>
+            {% endfor %}
+        </ul>
+    </article>
+	
+</section>	
 
-        <button type="submit">Assign Modules</button>
-    </form>
+<script>
+	
 
-    <h3>Currently Assigned Modules:</h3>
-    <ul>
-        {% for module in farmer.modules.all %}
-            <li>{{ module.name }}</li>
-        {% empty %}
-            <li>No modules assigned yet.</li>
-        {% endfor %}
-    </ul>
+</script>
 </body>
 </html>

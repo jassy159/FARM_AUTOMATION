@@ -25,8 +25,10 @@ SECRET_KEY = 'django-insecure-8en^fyi7k0)4eaja7z-&4$))^+qfvb!$8yf*hv&)uzr+a!gh_k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*','yoursubdomain.serveo.net']
+CSRF_TRUSTED_ORIGINS = [
+    'https://yoursubdomain.serveo.net',
+]
 
 # Application definition
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'farmapi',
     'rest_framework',
+    'simple_history',
     'rest_framework_simplejwt',
 
 ]
@@ -146,3 +149,5 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+WSGI_APPLICATION = 'farmauto.wsgi.application'
