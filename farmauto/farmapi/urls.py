@@ -41,5 +41,6 @@ urlpatterns = [
    
 
     #accutator state 
-    path('accustate/get_accutator_modules/<str:module_name>',views.get_accutator_modules,name='get_accutator_modules')
+    path('accustate/get_accutator_modules/<str:module_name>',views.get_accutator_modules,name='get_accutator_modules'),
+    path('history/' ,views.module_history_chart , name='history')
     ]

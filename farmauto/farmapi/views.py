@@ -52,7 +52,7 @@ def LoginView(request):
                 return redirect('dashboard')
         else:
             print(user)
-            return render(request, 'login.html', {"error" : "invalid"})
+            return render(request, 'login.html', {"error" : "invalid password"})
         
     return render(request, 'login.html')    
 
@@ -63,10 +63,34 @@ def DashboardView(request):
     if user.is_authenticated:
         farmer = FarmerUserModel.objects.get(pk=user.id)
         farmer_sensor = farmer.modules.exclude(module_type='AM')
-        farmer_acc = farmer.modules.filter(module_type='AM')
-        print(farmer_sensor)
+        farmer_acc = AccutatorModules.objects.filter(module__user=farmer)
+        print([x.module_type for x in farmer_sensor],'-----')
+        moduleType = [x.module_type for x in farmer_sensor]
+        print(moduleType)
+        moduleValues = {}
+        for i in range(0,len(farmer_sensor)):
+            if(moduleType[i]=="LM"):
+                lm = (LightLevelModules.objects.get(module = farmer_sensor[i]))
+                moduleValues[f'{lm.module.name} light intensity'] = lm.light_intensity
+            elif(moduleType[i]=="BM"):
+                bm = BasicModules.objects.get(module = farmer_sensor[i])
+                print(bm.module.name)
+                moduleValues[f'{bm.module.name} temperature'] = bm.temperature
+                moduleValues[f'{bm.module.name} humidity'] = bm.humidity
+                moduleValues[f'{bm.module.name} soilmoisture'] = bm.soil_moisture
+                moduleValues[f'{bm.module.name} ph Value'] = bm.pH_value
+                    
+                # bmValues = [bm.temperature, bm.]
+            elif(moduleType[i]=="WM"):
+                wm = WaterTankLevelModules.objects.get(module = farmer_sensor[i])
+                moduleValues[f'{wm.module.name} watermodule'] = wm.water_level
+            
 
-        return render(request, 'dashboard.html', {'user' : user,'farmer':farmer , "sensor":farmer_sensor,'accutator':farmer_acc})
+        print(moduleValues,'************')        #needs MOdifcation
+
+
+
+        return render(request, 'dashboard.html', {'user' : user,'farmer':farmer , "sensor":farmer_sensor,'accutator':farmer_acc,'values': moduleValues})
     else:
         return redirect('login')
     
@@ -110,7 +134,7 @@ def ModuleDelete(request, pk):
 # View to assign modules to a farmer
 
 
-
+@login_required
 def assign_module_to_farmer(request, farmer_id):
     farmer = FarmerUserModel.objects.get(pk=farmer_id)
     if request.method == 'POST':
@@ -123,21 +147,29 @@ def assign_module_to_farmer(request, farmer_id):
                     raise forms.ValidationError(f"Password for module '{module.name}' does not match.")
                 farmer.modules.add(module)  # Add the module to the farmer's modules
                 module.has_user = True  # Set has_user to True
+                module.user = request.user
                 module.save()
             return redirect('assignModule', farmer_id)
     else:
         form = FarmerModuleAssignForm()
     return render(request, 'addModule.html', {'form': form, "farmer": farmer})
 #remove the module from farmer
+
 def remove_module_from_farmer(request, farmer_id, module_id):
     farmer = get_object_or_404(FarmerUserModel, id=farmer_id)
-    module = get_object_or_404(Modules, id=module_id)
-
+    print(farmer)
+    print(module_id)
+    module = Modules.objects.get(id=module_id)
+    print(module)
+    print(module.has_user , module.user)
+    module.has_user = False
+    module.user = None
+    print(module.has_user , module.user)
     # Remove the module from the farmer's modules
-    if module in farmer.modules.all():
-        farmer.modules.remove(module)
-
-    return redirect('assignModule',farmer_id=farmer.id)
+    module.save()
+    farmer.modules.remove(module)
+    print(farmer.modules.all())
+    return redirect('dashboard')
 
 
 class BasicModuleCreateView(APIView):
@@ -269,8 +301,7 @@ def accutator_module_update_view(request, module_name):
     initial_data = {
         'value_pattern': accutator_module.value_pattern,
         'sensor_module': accutator_module.sensor_module,
-        'min_value': accutator_module.min_value,
-        'max_value': accutator_module.max_value,
+        'triggerValue' : accutator_module.triggerValue,
         'sensor_type': accutator_module.sensor_type,
     }
 
@@ -388,27 +419,29 @@ def update_sensor_module_value(request):
 @api_view(['GET'])
 def get_accutator_modules(request, module_name):
     accutator_module = AccutatorModules.objects.get(module=Modules.objects.filter(name=module_name)[0])
-    min,max , valuePattern, sensorType = accutator_module.min_value,accutator_module.max_value,accutator_module.value_pattern,accutator_module.sensor_type
+    triggerValue , valuePattern, sensorType = accutator_module.triggerValue,accutator_module.value_pattern,accutator_module.sensor_type
+    inverse = accutator_module.inverse
     user = FarmerUserModel.objects.get(modules = Modules.objects.filter(name=module_name)[0])
-    print(user)
+    print(user , inverse)
     if(valuePattern == 'Average'):
-        ar = 0
-        n=0
-        if(sensorType in ['temperature', 'humidity','soilmoisture','phvalue']):
-            pass
-        elif(sensorType == "lightsensor"):
-            print(10)
-            user_modules = user.modules.filter(module_type='LM')  # Only Light Intensity Modules
-            light_object = LightLevelModules.objects.filter(module__in = user_modules)
+        pass
+    #     ar = 0
+    #     n=0
+    #     if(sensorType in ['temperature', 'humidity','soilmoisture','phvalue']):
+    #         pass
+    #     elif(sensorType == "lightsensor"):
+    #         print(10)
+    #         user_modules = user.modules.filter(module_type='LM')  # Only Light Intensity Modules
+    #         light_object = LightLevelModules.objects.filter(module__in = user_modules)
             
-            for i in light_object:
-                print(10)
-                n = n+1
-                ar = ar + float(getattr(i,"light_intensity"))
+    #         for i in light_object:
+    #             print(10)
+    #             n = n+1
+    #             ar = ar + float(getattr(i,"light_intensity"))
 
             
             
-        return JsonResponse({"avg":ar/n})        
+    #     return JsonResponse({"avg":ar/n})        
             
     else:
             print(accutator_module.sensor_module.module_type,999999999999)
@@ -418,32 +451,151 @@ def get_accutator_modules(request, module_name):
                 if sensorType == "temperature":
                     
                     temp = getattr(sensorModule, 'temperature')
-                    print(temp)
-                    
-                    return JsonResponse({"sensorModule":temp,})
+                    if(inverse == False):
+                        if(sensorModule.temperature > triggerValue):
+                            state = True
+                        else:
+                            state = False
+                    else:
+                        if(sensorModule.temperature > triggerValue):
+                            state = False
+                        else:
+                            state = True   
+                    accutator_module.status = state
+                    accutator_module.save()                                   
+                    return JsonResponse({"state":state})
                 if sensorType == "humidity":
                     
                     temp = getattr(sensorModule, 'temperature')
                     print(temp)
-                    return JsonResponse({"sensorModule":temp})
+                    if(inverse == False):
+                        if(sensorModule.humidity > triggerValue):
+                            state = True
+                        else:
+                            state = False
+                    else:
+                        if(sensorModule.humidity > triggerValue):
+                            state = False
+                        else:
+                            state = True   
+                    accutator_module.status = state
+                    accutator_module.save()  
+                    return JsonResponse({"state":state})
+                
                 if sensorType == "soilmoisture":
                     
-                    temp = getattr(sensorModule, 'temperature')
-                    print(temp)
-                    return JsonResponse({"sensorModule":temp})
+                    
+                    if(inverse == False):
+                        if(sensorModule.soil_moisture > triggerValue):
+                            state = True
+                        else:
+                            state = False
+                    else:
+                        if(sensorModule.soil_moisture > triggerValue):
+                            state = False
+                        else:
+                            state = True   
+                    accutator_module.status = state
+                    accutator_module.save()  
+                    return JsonResponse({"state":state})
                 if sensorType == "phvalue":
                     
-                    temp = getattr(sensorModule, 'temperature')
-                    print(temp)
-                    return JsonResponse({"sensorValue":temp})
+                    
+                    if(inverse == False):
+                        if(sensorModule.pH_value > triggerValue):
+                            state = True
+                        else:
+                            state = False
+                    else:
+                        if(sensorModule.pH_value > triggerValue):
+                            state = False
+                        else:
+                            state = True   
+                    accutator_module.status = state
+                    accutator_module.save()  
+                    return JsonResponse({"state":state})
             elif(accutator_module.sensor_module.module_type == "LM"):
-                print(55    )
+                
+                
                 sensorModule = LightLevelModules.objects.get(module = accutator_module.sensor_module)
-                print(sensorModule)
-                light = getattr(sensorModule,'light_intensity')
-                return JsonResponse({"sensorValue":light})  
+                
+                if(inverse == False):
+                        if(sensorModule.light_intensity > triggerValue):
+                            state = True
+                        else:
+                            state = False
+                else:
+                        if(sensorModule.light_intensity > triggerValue):
+                            state = False
+                        else:
+                            state = True   
+                
+                
+                accutator_module.status = state
+                accutator_module.save()             
+                return JsonResponse({"state":state})  
             
             elif(accutator_module.sensor_module.module_type == "WM"):
                 sensorModule = WaterTankLevelModules.objects.get(module = accutator_module.sensor_module)
-                water_level = getattr(sensorModule,'water_level')
-                return JsonResponse({"sensorValue":water_level})  
+                if(inverse == False):
+                        if(sensorModule.water_level > triggerValue):
+                            state = True
+                        else:
+                            state = False
+                else:
+                        if(sensorModule.water_level > triggerValue):
+                            state = False
+                        else:
+                            state = True   
+                
+                
+                accutator_module.status = state
+                accutator_module.save()    
+                return JsonResponse({"state":state})  
+
+
+
+
+from django.shortcuts import render
+from .models import BasicModules, LightLevelModules, WaterTankLevelModules, AccutatorModules
+
+def module_history_chart(request):
+    # Fetch data for Basic Modules
+    basic_modules = BasicModules.objects.all()
+    temperature_values = [module.temperature for module in basic_modules]
+    humidity_values = [module.humidity for module in basic_modules]
+    soil_moisture_values = [module.soil_moisture for module in basic_modules]
+    basic_timestamps = [module.timestamp.strftime("%Y-%m-%d %H:%M:%S") for module in basic_modules]
+
+    # Fetch data for Light Level Modules
+    light_modules = LightLevelModules.objects.all()
+    light_level_values = [module.light_intensity for module in light_modules]
+    light_timestamps = [module.timestamp.strftime("%Y-%m-%d %H:%M:%S") for module in light_modules]
+
+    # Fetch data for Water Tank Level Modules
+    water_modules = WaterTankLevelModules.objects.all()
+    water_level_values = [module.water_level for module in water_modules]
+    water_timestamps = [module.timestamp.strftime("%Y-%m-%d %H:%M:%S") for module in water_modules]
+
+    # Fetch data for Actuator Modules
+    actuator_modules = AccutatorModules.objects.all()
+    actuator_status_values = [module.status for module in actuator_modules]
+    actuator_timestamps = [module.timestamp.strftime("%Y-%m-%d %H:%M:%S") for module in actuator_modules]
+
+    context = {
+        'basic_timestamps': basic_timestamps,
+        'temperature_values': temperature_values,
+        'humidity_values': humidity_values,
+        'soil_moisture_values': soil_moisture_values,
+        
+        'light_timestamps': light_timestamps,
+        'light_level_values': light_level_values,
+        
+        'water_timestamps': water_timestamps,
+        'water_level_values': water_level_values,
+        
+        'actuator_timestamps': actuator_timestamps,
+        'actuator_status_values': actuator_status_values,
+    }
+
+    return render(request, 'module_history_chart.html', context)

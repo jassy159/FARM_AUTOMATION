@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8en^fyi7k0)4eaja7z-&4$))^+qfvb!$8yf*hv&)uzr+a!gh_k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','yoursubdomain.serveo.net']
+ALLOWED_HOSTS = ['*','yoursubdomains.serveo.net']
 CSRF_TRUSTED_ORIGINS = [
     'https://yoursubdomain.serveo.net',
 ]

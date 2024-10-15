@@ -30,38 +30,15 @@
 			<h1>Overall Farm Status</h1>
 			<div class='OverAllStatusContainer'>
 				<div class='OverallDataContainer'>
+					{% for key, values in values.items %}
 					<div class='card'>
-						<div class="gauge">
+						<div class="gauge" values ='{{values}}'>
 						</div>
-						<p class='gaugeName'>Temperature Gauge</p>
+						<p class='gaugeName'>{{key}} {{values}} </p>
 					</div>
-					<div class='card'>
-						<div class="gauge">
-						</div>
-						<p class='gaugeName'>Temperature Gauge</p>
-					</div>
-					<div class='card'>
-						<div class="gauge">
-						</div>
-						<p class='gaugeName'>Temperature Gauge</p>
-					</div>
-					<div class='card'>
-						<div class="gauge">
-						</div>
-						<p class='gaugeName'>Temperature Gauge</p>
-					</div>
-					<div class='card'>
-						<div class="gauge">
-						</div>
-						<p class='gaugeName'>Temperature Gauge</p>
-					</div>
-					<div class='card'>
-						<div class="gauge">
-						</div>
-						<p class='gaugeName'>Temperature Gauge</p>
-					</div>
+					{% endfor %}
 				</div>
-				<div class='ActivityLog'>
+				<!-- <div class='ActivityLog'>
 					<div class='Message'>
 						<p>Motor has started 3 sec ago</p>
 					</div>
@@ -90,11 +67,12 @@
 						<p>Motor has started 3 sec ago</p>
 					</div>
 
-				</div>
+				</div> -->
 			</div>
 		</article>
 		<article class='connectedModules'>
 			<h1>Connected Modules </h1>
+			
 			<div class='container'>
 				<div class='sensorModules'>
 					<h1>Sensor Modules</h1>
@@ -104,37 +82,36 @@
 						{% for modules in sensor%}
 						<div class='card'>
 							<h1>{{modules.name}}</h1>
+							
 							<ul>
-								{%if modules.module_type is BM%}
+								{%if modules.module_type == 'BM' %}
 								<li>Temperature</li>
 								<li>Humidity</li>
 								<li>Soil Moisture</li>
 								<li>pH Level</li>
-								{%elif modules.module_type is LM %}
+								{%elif modules.module_type == 'LM' %}
 								<li>Light Intensity</li>
-								{%else%}
+								{%elif modules.module_type == 'WM' %}
 								<li>Water level</li>
+								
+								
 								{%endif%}
+								<a href="{% url 'detachModule' 	user.id modules.id %}"><li>Remove</li></a>
 
 							</ul>
 
 						</div>
 						{%endfor%}
 						<!-- Add modules btn -->
-						<a href="{% url 'assignModule' user.id %}">
-							<div class='card'>
 
-								<h1>ADD MODULES</h1>
-							</div>
-						</a>
 					</div>
 				</div>
-				<div class='WaterLevelGuage'>
-					<div class='line'></div>
-					<div class='line'></div>
-					<div class='line'></div>
-					<p>Water Level</p>
-				</div>
+					<!-- <div class='WaterLevelGuage'>
+						<div class='line'></div>
+						<div class='line'></div>
+						<div class='line'></div>
+						<p>Water Level</p>
+					</div> -->
 			</div>
 			<div class='AccutatorModules'>
 				<h1>Accutator Modules</h1>
@@ -154,17 +131,24 @@
 					</div>
 					{% for mod in accutator%}
 					<div class='card'>
-						<h1>{{mod.name}}</h1>
+						<h1>{{mod.module.name}}</h1>
 						<ul>
-							<li><a href="{% url 'accutator_module_update' mod.name%}">Link</a></li>
-							<li>{{mod.accutator_module.value_pattern}}</li>
-							{%if mod.accutator_module.sensor_module%}
-							<li>{{mod.accutator_module.sensor_module}}</li>
+							<li><a href="{% url 'accutator_module_update' mod.module.name%}">Link</a></li>
+							<li>{{mod.value_pattern}}</li>
+							{%if mod.sensor_module%}
+							<li>{{mod.sensor_module}}</li>
 							{%endif%}
-							<li>{{mod.accutator_module.sensor_type}}</li>
-							<li>{{mod.accutator_module.status}}</li>
-							<li>{{mod.accutator_module.min_value}}</li>
-							<li>{{mod.accutator_module.max_value}}</li>
+							<li>{{mod.sensor_type}}</li>
+							<li>Status {{mod.status}}</li>
+							<li>{{mod.triggerValue}}</li>
+							<li>Inverse {{mod.inverse}}</li>
+							{% if mod.inverse == False %}
+							<li>Accutator Turns on if value is above {{mod.triggerValue}}</li>
+							{%else%}
+							<li>Accutator Turns on if value is below {{mod.triggerValue}}</li>
+							{%endif%}
+							
+							<a href="{% url 'detachModule' 	user.id mod.module.id %}"><li>Remove</li></a>
 						
 
 
@@ -172,13 +156,16 @@
 
 					</div>
 					{%endfor%}
+					
+
+				</div>
+				
+				<a href="{% url 'assignModule' user.id %}">
 					<div class='card'>
 
 						<h1>ADD MODULES</h1>
 					</div>
-
-				</div>
-
+				</a>	
 
 			</div>
 		</article>
@@ -186,13 +173,19 @@
 	</section>
 
 	<script>
+		document.addEventListener('DOMContentLoaded' , function(){
+			const guagues = document.querySelectorAll('.gauge');
+			guagues.forEach(function(guageDiv){
+				const values = parseInt(guageDiv.getAttribute('values'))
+				console.log(getComputedStyle(document.querySelector('.gauge')).getPropertyValue('--deg'));
+				console.log(values)
+			guageDiv.style.setProperty('--deg', `${values}deg`);	
+			console.log('Computed --deg:', getComputedStyle(guageDiv).getPropertyValue('--deg'));
+			})
 
-		function logfunc() {
-			let deg = document.querySelector('input').value
-			console.log(deg);
-			console.log(getComputedStyle(document.querySelector('.gauge')).getPropertyValue('--deg'));
-			document.querySelector('.gauge').style.setProperty('--deg', `${deg}deg`);
-		}
+
+		})	
+		
 
 	</script>
 </body>

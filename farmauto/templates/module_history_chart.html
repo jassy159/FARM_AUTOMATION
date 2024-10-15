@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Charts</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Sensor Data Charts</h1>
+</header>
+
+<section class="graphs">
+    <!-- Basic Module Chart -->
+    <h2>Basic Module Data</h2>
+    <canvas id="basicChart" style="width:100%;max-width:700px"></canvas>
+    
+    <!-- Light Intensity Module Chart -->
+    <h2>Light Intensity Module Data</h2>
+    <canvas id="lightChart" style="width:100%;max-width:700px"></canvas>
+    
+    <!-- Water Level Module Chart -->
+    <h2>Water Tank Level Module Data</h2>
+    <canvas id="waterChart" style="width:100%;max-width:700px"></canvas>
+    
+    <!-- Actuator Module Chart -->
+    <h2>Actuator Module Data</h2>
+    <canvas id="actuatorChart" style="width:100%;max-width:700px"></canvas>
+</section>
+
+<script>
+    // Basic Module Chart
+    const basicCtx = document.getElementById('basicChart').getContext('2d');
+    const basicData = {
+        labels: {{ basic_timestamps|safe }},
+        datasets: [
+            {
+                label: 'Temperature',
+                data: {{ temperature_values|safe }},
+                fill: false,
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            },
+            {
+                label: 'Humidity',
+                data: {{ humidity_values|safe }},
+                fill: false,
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            },
+            {
+                label: 'Soil Moisture',
+                data: {{ soil_moisture_values|safe }},
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }
+        ]
+    };
+    new Chart(basicCtx, { type: 'line', data: basicData });
+
+    // Light Intensity Module Chart
+    const lightCtx = document.getElementById('lightChart').getContext('2d');
+    const lightData = {
+        labels: {{ light_timestamps|safe }},
+        datasets: [
+            {
+                label: 'Light Intensity',
+                data: {{ light_level_values|safe }},
+                fill: false,
+                borderColor: 'rgb(255, 206, 86)',
+                tension: 0.1
+            }
+        ]
+    };
+    new Chart(lightCtx, { type: 'line', data: lightData });
+
+    // Water Tank Level Module Chart
+    const waterCtx = document.getElementById('waterChart').getContext('2d');
+    const waterData = {
+        labels: {{ water_timestamps|safe }},
+        datasets: [
+            {
+                label: 'Water Level',
+                data: {{ water_level_values|safe }},
+                fill: false,
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }
+        ]
+    };
+    new Chart(waterCtx, { type: 'line', data: waterData });
+
+    // Actuator Module Chart (Bar chart for boolean values)
+    const actuatorCtx = document.getElementById('actuatorChart').getContext('2d');
+    const actuatorData = {
+        labels: {{ actuator_timestamps|safe }},
+        datasets: [
+            {
+                label: 'Actuator Status',
+                data: {{ actuator_status_values|safe }},
+                backgroundColor: 'rgb(153, 102, 255)'
+            }
+        ]
+    };
+    new Chart(actuatorCtx, { type: 'bar', data: actuatorData });
+</script>
+
+</body>
+</html>

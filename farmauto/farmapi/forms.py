@@ -29,7 +29,7 @@ class FarmerModuleAssignForm(forms.ModelForm):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         selected_module = cleaned_data.get("modules").first()
-
+        
         # Validate password for the selected module
         if selected_module:
             if selected_module.password != password:
@@ -173,4 +173,4 @@ class AccutatorModuleForm(forms.ModelForm):
 
     class Meta:
         model = AccutatorModules
-        fields = ['value_pattern', "sensor_module", 'min_value', "max_value", 'sensor_type']  # include sensor_type in the form
+        fields = ['value_pattern', "sensor_module", "triggerValue", 'sensor_type' , 'inverse']  # include sensor_type in the form

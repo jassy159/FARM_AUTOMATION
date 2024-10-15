@@ -68,9 +68,9 @@ section{
 		
 	}
 	.gauge::after{
-		content:'45%';
+		content:attr(values)'%';
 		display:flex;
-		justify-content:center;
+		justify-content:center	;
 		align-items:center;
 		position:absolute;
 		background:#c3ffbd;
@@ -82,7 +82,7 @@ section{
 		transform:translate(-50%,-50%);
 	}
 	.gauge::before{
-		--deg :90deg;
+		
 		content:'';
 		position:absolute;
 		background: conic-gradient(from 225deg, yellow var(--deg), transparent var(--deg));
